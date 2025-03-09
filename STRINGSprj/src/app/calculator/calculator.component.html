@@ -1,6 +1,7 @@
 <form>
   <input type="text" name="number" [(ngModel)]="number" />
-  <button (click)="Add(number)">Call add function</button>
+  <button (click)="add(number)">Call add function</button>
   <p>Result: {{ result }}</p>
   <p>{{ errorMessage }}</p>
+  <p>{{ negatives }}</p>
 </form>

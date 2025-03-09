@@ -9,17 +9,15 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './calculator.component.scss'
 })
 export class CalculatorComponent {
+
   number: string = '';
   result: number | undefined;
-
   isNan = false;
-
   notAllowedCharacters: string = '';
-
   errorMessage: string = '';
+  negatives: string = '';
 
-
-  Add(number: string): number {
+  add(number: string): number {
 
     let numberToArray = number.split('');
 
@@ -43,8 +41,9 @@ export class CalculatorComponent {
           this.errorMessage = '';
           return (this.result = parseInt(numberToArray[0]));
 
-          //Two digit numbers with comma:
+        //Two digit numbers with comma:
         } else if (numberToArray.length == 3 && numberToArray[1] == ',') {
+
           const filteredArray = numberToArray.filter((el) => el != ',');
           this.errorMessage = '';
           this.result = parseInt(filteredArray[0]) + parseInt(filteredArray[1]);
@@ -52,19 +51,31 @@ export class CalculatorComponent {
 
           //If it's not a 1 or 2 digit number, but it's a valid number, then:
         } else {
-          this.errorMessage = 'Step 2 rigo 55';
+          //Step 2;
+          this.addAnUnknownAmountOfNumbers(numberToArray);
         }
 
-        //But if it's not a valid number, then:
+
       } else {
-        this.result = undefined;
-        this.errorMessage = 'Errore: inserire solo numeri validi rigo 63';
+
+        //If it's a negative number, then:
+        //Step 3
+        if(parseInt(number) < 0){
+          this.negativesNotAllowed(number);
+
+        //But if it's not a valid number, then:
+        }else{
+          this.result = undefined;
+          this.errorMessage = 'Errore: inserire solo numeri validi rigo 66';
+        }
+
       }
 
         return this.result ? this.result : 0;
 
       }
-    }
+
+  }
 
   checkIfNan(numbers: string[]): boolean {
 
@@ -98,5 +109,48 @@ export class CalculatorComponent {
 
   }
 
-}
+  //Step 2
+  addAnUnknownAmountOfNumbers(numbers: string[]): number{
 
+    if(parseInt(this.number) <= 1000){
+
+      let sum = 0;
+
+     numbers.forEach((n) => {
+        if(n != ','){
+         sum += parseInt(n);
+        }
+      })
+
+    this.errorMessage = '';
+    return this.result = sum;
+
+    }else{
+
+      this.handleBiggerNumbers(numbers);
+      return 0;
+
+    }
+
+  }
+
+  //Step 3
+  negativesNotAllowed(negativeNumber: string): void{
+
+    this.errorMessage = '';
+    this.negatives += negativeNumber;
+    throw new Error('Negatives not allowed: ' + this.negatives);
+
+  }
+
+  //Step 4
+  handleBiggerNumbers(numbers: string[]){
+
+    this.errorMessage = '';
+    return this.result = parseInt(numbers.reverse()[0]);
+
+  }
+
+  //Delimiters: Steps 5, 6 and 7
+
+}
