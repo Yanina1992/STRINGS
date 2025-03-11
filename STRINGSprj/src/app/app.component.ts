@@ -12,4 +12,5 @@ import { CalculatorComponent } from './calculator/calculator.component';
 })
 export class AppComponent {
   title = 'STRINGSprj';
+
 }

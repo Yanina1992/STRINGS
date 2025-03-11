@@ -159,7 +159,7 @@ export class CalculatorComponent {
   //Delimiters: Step 5
   handleDelimiters(numbers: string[]): void{
 
-    let delimiter: string = "";
+    /*let delimiter: string = "";
 
     let patternBody = '';
     let patternStructure = '';
@@ -218,7 +218,91 @@ export class CalculatorComponent {
     }else{
       this.result = undefined;
       this.errorMessage = 'Errore: inserire un delimitatore valido rigo 207';
-    }
+    }*/
+
+ //CODICE DI PROVA
+
+        // Numero di caratteri consentiti dal delimitatore personalizzato
+        let countLength: number = 0;
+
+        // Valore del campo di input
+        let numbersToString: string = numbers.join('');
+
+        // Prendere solo il delimitatore
+        let delimiterStructure: string = '';
+
+        let sum: number = 0;
+
+        if (numbers[1] == '/' &&
+            numbers[2] == '[' &&
+            Number.isNaN(parseInt(numbers[3]))
+        ) {
+
+            // Costruisci una regex per catturare delimitatori multipli racchiusi tra parentesi quadre
+            let delimiterRegex = /\/\/(\[.*?\])+\/\//;
+            let match = numbersToString.match(delimiterRegex);
+
+            if (match != null && match[0] != null) {
+                // Estrai i delimitatori
+
+                let delimiters = match[0].match(/\[(.*?)\]/g)?.map(d => d.slice(1, -1)) || [];
+
+
+                // Escapare i delimitatori per l'uso nella regex
+                let escapedDelimiters = delimiters!.map(d => d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+                // Costruisci una regex che corrisponde ai numeri separati da questi delimitatori
+                let numberRegex = new RegExp(`\\d+(${escapedDelimiters.join('|')}\\d+)*`);
+
+                countLength = match[0].length;
+                numbersToString = numbers.toString().replace(/,/g, '');
+                delimiterStructure = numbersToString.slice(0, countLength);
+
+                /*if (delimiterStructure == match[0]) {
+                    for (let i = countLength; i < numbers.length; i++) {
+                        if (!Number.isNaN(parseInt(numbers[i])) && !escapedDelimiters.includes(numbers[i])) {
+                            sum += parseInt(numbers[i]);
+                            this.errorMessage = '';
+                            this.result = sum;
+                        } else if (escapedDelimiters.includes(numbers[i])) {
+                          //qui mi va in errore
+                            sumDelimiters++;
+
+                            //mi finisce qui
+                        } else {
+                            this.result = undefined;
+                            this.errorMessage = 'Errore: inserire solo numeri e delimitatori validi rigo 204';
+                            break;
+                        }
+                    }*/
+
+                        if (delimiterStructure == match[0]) {
+                          let remainingNumbers = numbersToString.slice(countLength);
+                          let numberParts = remainingNumbers.split(new RegExp(escapedDelimiters.join('|'))); // Modificato per dividere i numeri usando i delimitatori escapati
+
+                          for (let part of numberParts) {
+                            if (
+                              !Number.isNaN(parseInt(part)) &&
+                              part.length == 1
+                            ) {
+                              sum += parseInt(part);
+                            } else {
+                              this.result = undefined;
+                              this.errorMessage =
+                                'Errore: inserire solo numeri di una cifra e delimitatori validi rigo 204';
+                              return;
+                            }
+                          }
+
+                          this.errorMessage = '';
+                          this.result = sum;
+                }
+            }
+
+        } else {
+            this.result = undefined;
+            this.errorMessage = 'Errore: inserire un delimitatore valido rigo 207';
+        }
 
   }
 
