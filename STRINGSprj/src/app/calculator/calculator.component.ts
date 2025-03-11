@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { log } from 'console';
 
 @Component({
   selector: 'app-calculator',
@@ -62,6 +63,10 @@ export class CalculatorComponent {
         //Step 3
         if(parseInt(number) < 0){
           this.negativesNotAllowed(number);
+
+        //If it begins with '//[', we need to check if there's a valid composition with an allowed delimiter, then:
+        } else if(numberToArray[0] == '/'){
+          this.handleDelimiters(numberToArray);
 
         //But if it's not a valid number, then:
         }else{
@@ -151,6 +156,72 @@ export class CalculatorComponent {
 
   }
 
-  //Delimiters: Steps 5, 6 and 7
+  //Delimiters: Step 5
+  handleDelimiters(numbers: string[]): void{
+
+    let delimiter: string = "";
+
+    let patternBody = '';
+    let patternStructure = '';
+
+    //Number of chars allowed by the costumized delimiter
+    let countLength: number = 0;
+
+    //Input field value
+    let numbersToString:string = '';
+
+    //Take only delimiter
+    let delimiterStructure:string = '';
+
+    let sum: number = 0;
+    let sumDelimiters: number = 0;
+
+    if(numbers[1] == '/' &&
+      numbers[2] == '[' &&
+      Number.isNaN(parseInt(numbers[3]))
+    ){
+
+      for (let i = 3; i < numbers.length - 1; i++) {
+        if(numbers[i] == numbers[3]){
+          delimiter += numbers[i];
+        }else{
+          break;
+        }
+
+      }
+
+      patternBody = '[' + delimiter + ']';
+      patternStructure = '//' + patternBody + '//';
+
+      countLength = delimiter.length + 6;
+      numbersToString = numbers.toString().replace(/,/g, '');
+      delimiterStructure = numbersToString.slice(0, countLength)
+
+      if(delimiterStructure == patternStructure){
+        for (let i = countLength; i < numbers.length; i++) {
+          if(!Number.isNaN(parseInt(numbers[i])) && numbers[i] != delimiter[0]){
+            sumDelimiters = 0;
+            sum += parseInt(numbers[i]);
+            this.errorMessage = '';
+            this.result = sum;
+          } else if (numbers[i] == delimiter[0] && sumDelimiters > delimiter.length){
+            //handle delimiters with multiple characters
+            sumDelimiters += 1;
+          } else {
+            this.result = undefined;
+            this.errorMessage = 'Errore: inserire solo numeri e delimitatori validi rigo 204';
+            break
+          }
+        }
+      }
+
+    }else{
+      this.result = undefined;
+      this.errorMessage = 'Errore: inserire un delimitatore valido rigo 207';
+    }
+
+  }
 
 }
+
+
